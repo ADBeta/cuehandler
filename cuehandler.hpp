@@ -4,45 +4,50 @@
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 *
-* ADBeta    26 Nov 2023    V0.0.3
+* ADBeta    26 Nov 2023    V0.1.2
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
 
 #include <string>
 #include <fstream>
-#include <vector>
-
 
 class CueFile {
+	/*** Public Members *******************************************************/
 	public:
-	//Overloaded constructor. Can either pass filename on construct, or after
-	CueFile();
-	CueFile(const std::string &filename);
+	//Constructor with Member Initilizer List
+	CueFile(const char *fn) : filename(fn){}
+	
 	
 	//Destructor to clear RAM overhead
 
 	
 	/*** File Management ******************************************************/
-	//TODO overloaded open. one allows setting cue_file, the other uses it. Check for .empty
-
-
-	//TODO REad
+	//Reads the CueFile and parses it into the CueData structres. 
+	//Returns 0 on success, or negative values on error code
+	int Read();
+	
 	//TODO write
 	
 	//TODO Modifiers
 	
 	//TODO windows to linux line end
 	//
+
+
+	//TODO CueData structures
 	
 	/*** Private Members ******************************************************/
 	//private:
-	std::fstream cue_file;
-	
-	
-	//Vector keeps all lines of the .CUE for modifcation & read/write
-	
 
+	/*** File Management ******************************************************/
+	std::fstream cue_file;
+	std::string filename;
+	
+	//Low level file management. Return 0on success or error codes on failure
+	int Open();
+	int Close();
+	
 };
 
 

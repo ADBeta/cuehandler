@@ -7,21 +7,62 @@
 #include <string>
 #include <fstream>
 
+#include <iostream> //TODO
+
+#include "cuehandler.hpp"
+
+
+/*** API Member Functions *****************************************************/
+//Reads the given file, Parses it, sets up the CueData structure tree
+//then returns
+int CueFile::Read() {
+	//Guard against use without a set filename
+	if(this->filename.empty()) return -1;
+	
+	//Attempt to open the file. Return error if failed
+	if(this->Open() != 0) return -2;
+	
+	//Reset file pointer/flags, then read the file into a RAM File
+	this->cue_file.clear();
+	this->cue_file.seekg(0, std::ios::beg);
+	
+	//Read the File line by line.
+	std::string line_str;
+	while(getline(this->cue_file, line_str)) {
+		//Skip Blank Lines
+		if(line_str.empty()) continue;
+		
+		//TODO Parse shit here
+	}
+	
+	//Close the File and return success
+	this->Close();
+	return 0;
+}
 
 
 
 
 
 
+/*** Private Member Functions *************************************************/
+int CueFile::Open() {
+	int errcode = 0;
+	
+	this->cue_file.open(this->filename, std::ios::in | std::ios::out);
+	if(this->cue_file.is_open() == false) errcode = -1;
+	
+	return errcode;
+}
 
-
-
-
-
-
-
-
-
+int CueFile::Close() {
+	int errcode = 0;
+	
+	this->cue_file.close();
+	if(this->cue_file.fail()) errcode = -1;
+	
+	return errcode;
+}
 
 
 
