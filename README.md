@@ -1,0 +1,11 @@
+# cuehandler
+
+This is a Small & Efficient library to Create, Modify and Impliment .CUE Files
+in C++
+
+cuehandler is designed to work with C++11 and newer.
+
+## TODO
+
+----
+This project is under GPLv2.0. See LICENSE for more info. ADBeta(c) Nov 2023
