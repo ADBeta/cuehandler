@@ -4,7 +4,7 @@
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 *
-* ADBeta    26 Nov 2023    V0.1.2
+* ADBeta    27 Nov 2023    V0.2.3
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -47,6 +47,21 @@ class CueFile {
 	//Low level file management. Return 0on success or error codes on failure
 	int Open();
 	int Close();
+	
+	/*** Cue Handling *********************************************************/
+	//Line Type Enumeration
+	enum class CueLineType {
+		Invalid,
+		File,
+		Track,
+		Index,
+		Remark
+	};
+	
+	//TODO Multi layer file structure
+	
+	//Take std::string, parse and return the type of line it is
+	CueLineType GetCueLineType(const std::string &line);
 	
 };
 
