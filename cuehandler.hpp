@@ -4,12 +4,13 @@
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 *
-* ADBeta    27 Nov 2023    V0.2.3
+* ADBeta    28 Nov 2023    V0.3.2
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
 
 #include <string>
+#include <list>
 #include <fstream>
 
 class CueFile {
@@ -35,7 +36,61 @@ class CueFile {
 	//
 
 
-	//TODO CueData structures
+	/*** Cue Handling *********************************************************/
+	//Line Type Enumeration
+	enum class CueLineType {
+		Invalid,
+		File,
+		Track,
+		Index,
+		Remark
+	};
+	
+	//TRACK Type Enumeration
+	enum class CueTrackType {
+		AUDIO,                     //Audio/Music (2352 — 588 samples)
+		CDG,                       //Karaoke CD+G (2448)
+		MODE_12048,                //CD-ROM Mode 1 Data (cooked)
+		MODE_12352,                //CD-ROM Mode 1 Data (raw)
+		MODE_22336,                //CD-ROM XA Mode 2 Data (form mix)
+		MODE_22352,                //CD-ROM XA Mode 2 Data (raw)
+		CDI_2336,                  //CDI Mode 2 Data
+		CDI_2352                   //CDI Mode 2 Data   
+	};
+	
+	//Forward Declare Cue Data Structures
+	struct CueFileObj;        //File Object contains data and a list of Tracks
+	struct CueTrackObj;       //Track Object contains data and a list of Indexes
+	struct CueIndexObj;       //Index Object contains just data
+	
+	//Create a List of CueFiles (Each File Structure is an Entry)
+	std::list<CueFileObj> CueEntry;
+	
+	//Define Cue Data Structures
+	struct CueFileObj {
+		
+		/*** Variables ***/
+		std::string filename;
+		std::string filetype;
+		std::list<CueTrackObj> Track;
+	};
+	
+	struct CueTrackObj {
+		
+		/*** Variables ***/
+		unsigned int id;
+		CueTrackType type;
+		std::list<CueIndexObj> Index;
+	};
+	
+	struct CueIndexObj {
+		CueIndexObj(const unsigned int v_id, const unsigned long v_bytes) 
+		            : id(v_id), bytes(v_bytes) {}
+		 
+		/*** Variables ***/
+		unsigned int id;
+		unsigned long bytes;
+	};
 	
 	/*** Private Members ******************************************************/
 	//private:
@@ -49,17 +104,6 @@ class CueFile {
 	int Close();
 	
 	/*** Cue Handling *********************************************************/
-	//Line Type Enumeration
-	enum class CueLineType {
-		Invalid,
-		File,
-		Track,
-		Index,
-		Remark
-	};
-	
-	//TODO Multi layer file structure
-	
 	//Take std::string, parse and return the type of line it is
 	CueLineType GetCueLineType(const std::string &line);
 	
@@ -90,36 +134,12 @@ class CueFile {
 
 /*
 
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "TeFiEd.hpp"
-
-#ifndef CUE_HANDLER_H
-#define CUE_HANDLER_H
-
- NOTE Using plain enums to allow them to convert to int 
-//Valid CUE line types, including INVALID, REM and EMPTY string types.
-enum t_LINE { ltEMPTY, ltFILE, ltTRACK, ltINDEX, ltREM, ltINVALID };
-
 //Valid FILE formats. (only binary is supported for now)
 enum t_FILE {ftBINARY};
 //String of LINE types mapped to enum
 extern const std::string t_FILE_str[];
 
-//Valid TRACK types  
-	AUDIO		Audio/Music (2352 — 588 samples)
-	CDG			Karaoke CD+G (2448)
-	MODE1/2048	CD-ROM Mode 1 Data (cooked)
-	MODE1/2352	CD-ROM Mode 1 Data (raw)
-	MODE2/2336	CD-ROM XA Mode 2 Data (form mix)
-	MODE2/2352	CD-ROM XA Mode 2 Data (raw)
-	CDI/2336	CDI Mode 2 Data
-	CDI/2352	CDI Mode 2 Data                   
-enum t_TRACK { ttAUDIO, ttCDG, ttMODE1_2048, ttMODE1_2352,
-               ttMODE2_2336, ttMODE2_2352, ttCDI_2336, ttCDI_2352 };
-extern const std::string t_TRACK_str[];
+
 
 
 ** CueHandler Class ********************************************************
