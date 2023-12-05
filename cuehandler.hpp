@@ -4,7 +4,7 @@
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 *
-* ADBeta    28 Nov 2023    V0.3.2
+* ADBeta    05 Dec 2023    V0.4.3
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -58,40 +58,41 @@ class CueFile {
 		CDI_2352                   //CDI Mode 2 Data   
 	};
 	
-	//Forward Declare Cue Data Structures
-	struct CueFileObj;        //File Object contains data and a list of Tracks
-	struct CueTrackObj;       //Track Object contains data and a list of Indexes
-	struct CueIndexObj;       //Index Object contains just data
-	
-	//Create a List of CueFiles (Each File Structure is an Entry)
-	std::list<CueFileObj> CueEntry;
-	
-	//Define Cue Data Structures
 	struct CueFileObj {
-		
-		/*** Variables ***/
 		std::string filename;
 		std::string filetype;
-		std::list<CueTrackObj> Track;
-	};
-	
-	struct CueTrackObj {
 		
-		/*** Variables ***/
-		unsigned int id;
-		CueTrackType type;
-		std::list<CueIndexObj> Index;
+		struct CueTrackObj {
+			unsigned int id;
+			CueTrackType type;
+		
+			struct CueIndexObj {
+			
+			//	CueIndexObj(const unsigned int v_id, const unsigned long v_bytes) 
+		       //     : id(v_id), bytes(v_bytes) {}
+			
+				unsigned int id;
+				unsigned long bytes;
+			};
+			std::list<CueIndexObj> Index;
+		
+		};
+		std::list<CueTrackObj> Track;
+	
+	
 	};
 	
-	struct CueIndexObj {
-		CueIndexObj(const unsigned int v_id, const unsigned long v_bytes) 
-		            : id(v_id), bytes(v_bytes) {}
-		 
-		/*** Variables ***/
-		unsigned int id;
-		unsigned long bytes;
-	};
+	//Create a List of CueFiles, this constitutes a CueSheet structure
+	std::list<CueFileObj> CueSheet;
 	
+	
+	
+	
+	
+	
+	
+	
+
 	/*** Private Members ******************************************************/
 	//private:
 

@@ -7,7 +7,7 @@ SRCS := $(wildcard ./*.cpp)
 CC := g++
 
 #Flags
-CFLAGS   := -std=c++11 -Wall -Wextra -Wsign-conversion -Wmissing-declarations -Wconversion -Wshadow -Wlogical-op -Wfloat-equal -Wunused -Wuninitialized -Wformat -Wunused-result -Wtype-limits
+CFLAGS   := -std=c++11 -Wall -Wsign-conversion -Wmissing-declarations -Wconversion -Wshadow -Wlogical-op -Wfloat-equal -Wunused -Wuninitialized -Wformat -Wunused-result -Wtype-limits
 #LDFLAGS  := -Llib
 #LDLIBS   := -lm /usr/lib/ 
 
