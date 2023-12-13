@@ -14,11 +14,11 @@ int main(/*const int argc, const char *argv[]*/) {
 	CueFile File("./test.txt");
 	
 	
-	CueFile::CueSheet test;
+	CueSheet test;
 	
 	//std::cout << File.Open() << std::endl;
 	File.Read(test);
-	
+	std::cout << "Printing..." << std::endl;
 	test.Print();
 	
 	

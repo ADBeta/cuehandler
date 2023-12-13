@@ -4,7 +4,7 @@
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 *
-* ADBeta    10 Dec 2023    V0.6.1
+* ADBeta    13 Dec 2023    V0.7.2
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -14,14 +14,23 @@
 #include <fstream>
 #include <cstdint>
 
-class CueFile {
-	/*** Public Members *******************************************************/
-	public:
-	//Constructor with Member Initilizer List
-	CueFile(const char *fn) : filename(fn) {}	
-	
-	//Destructor to clear RAM overhead
-
+/*** Cue Sheet Data Handling & Structure **************************************/
+//Hierarchical structure of all the infomation contained in a .cue file and 
+//Functions to handle the data structures
+struct CueSheet {
+	/*** Cue Sheet Data Types *********************************************/
+	//TRACK Type Enumeration
+	enum class CueTrackType {
+		Invalid,                   //Catch-all if error occurs
+		AUDIO,                     //Audio/Music (2352 — 588 samples)
+		CDG,                       //Karaoke CD+G (2448)
+		MODE1_2048,                //CD-ROM Mode 1 Data (cooked)
+		MODE1_2352,                //CD-ROM Mode 1 Data (raw)
+		MODE2_2336,                //CD-ROM XA Mode 2 Data (form mix)
+		MODE2_2352,                //CD-ROM XA Mode 2 Data (raw)
+		CDI_2336,                  //CDI Mode 2 Data
+		CDI_2352                   //CDI Mode 2 Data   
+	};
 	
 	/*** Cue Sheet Data Structures ********************************************/
 	//Line Type Enumeration
@@ -33,66 +42,71 @@ class CueFile {
 		Remark
 	};
 	
-	//TRACK Type Enumeration
-	enum class CueTrackType {
-		INVALID,                   //Catch-all if error occurs
-		AUDIO,                     //Audio/Music (2352 — 588 samples)
-		CDG,                       //Karaoke CD+G (2448)
-		MODE_12048,                //CD-ROM Mode 1 Data (cooked)
-		MODE_12352,                //CD-ROM Mode 1 Data (raw)
-		MODE_22336,                //CD-ROM XA Mode 2 Data (form mix)
-		MODE_22352,                //CD-ROM XA Mode 2 Data (raw)
-		CDI_2336,                  //CDI Mode 2 Data
-		CDI_2352                   //CDI Mode 2 Data   
-	};
+	/*** Structure Functions **********************************************/
+	//Take std::string, parse and return the type of line it is
+	static CueLineType StrToCueLineType(const std::string &input);
+	//Take CueLineType and return a string representation of it
+	static std::string CueLineTypeToStr(const CueLineType type);
 	
-	//Hierarchical structure of all the infomation contained in a .cue file.
-	//When all this information is viewed as a whole, it is a Cue Sheet. eg.
-	// Cue Sheet (.cue) : File : Track : Index
-	//                                   Index
-	//                           Track : Index
-	//                                   Index
-	//                    File : etc...
-	struct CueSheet {
-		//Prints all the information stored in the CueSheet to std out
-		int Print() const;
+	//Take a std::string of a string line and return the TrackType it is
+	static CueTrackType StrToCueTrackType(const std::string &input);
+	//Take a CueTrackType return the string Representation of it
+	static std::string CueTrackTypeToStr(const CueTrackType type);
 	
-		//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
-		struct FileObj {
-			//Initializer list
-			FileObj(std::string fn, std::string ft) 
-				: filename(fn), filetype(ft) {}
-		
-			std::string filename;
-			std::string filetype;
-						
-			//Cue "TRACK" Object, has "INDEX"s and some Track info
-			struct TrackObj {
-				TrackObj(uint16_t t_id, CueTrackType t_type)
-					: id(t_id), type(t_type) {}
-				
+	/*** API / Helper Functions *******************************************/
+
+
+
+	//Prints all the information stored in the CueSheet to std out
+	int Print() const;
+
+	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
+	struct FileObj {
+		//Initializer list
+		FileObj(std::string fn, std::string ft) 
+			: filename(fn), filetype(ft) {}
+	
+		std::string filename;
+		std::string filetype;
+					
+		//Cue "TRACK" Object, has "INDEX"s and some Track info
+		struct TrackObj {
+			TrackObj(uint16_t t_id, CueTrackType t_type)
+				: id(t_id), type(t_type) {}
+			
+			uint16_t id;
+			CueTrackType type;
+			
+			//Cue "INDEX" Object. Has Index data
+			struct IndexObj {
+				IndexObj(uint16_t i_id, uint32_t i_bytes)
+					: id(i_id), bytes(i_bytes) {}
+			
 				uint16_t id;
-				CueTrackType type;
-				
-				//Cue "INDEX" Object. Has Index data
-				struct IndexObj {
-					IndexObj(uint16_t i_id, uint32_t i_bytes)
-						: id(i_id), bytes(i_bytes) {}
-				
-					uint16_t id;
-					uint32_t bytes;
-				};
-				//List of INDEXs inside each TRACK
-				std::list<IndexObj> IndexList;
+				uint32_t bytes;
 			};
-			//List of TRACKs inside each FILE
-			std::list<TrackObj> TrackList;
+			//List of INDEXs inside each TRACK
+			std::list<IndexObj> IndexList;
 		};
-		//List of FILEs inside each Cue Sheet
-		std::list<FileObj> FileList;
+		//List of TRACKs inside each FILE
+		std::list<TrackObj> TrackList;
 	};
-		
-	/*** File Management ******************************************************/
+	//List of FILEs inside each Cue Sheet
+	std::list<FileObj> FileList;
+};
+
+/*** Cue File Management ******************************************************/
+class CueFile {
+	/*** Public Members *******************************************************/
+	public:
+	//Constructor with Member Initilizer List
+	CueFile(const char *fn) : filename(fn) {}	
+	
+	//Destructor to clear RAM overhead
+
+
+
+
 	//Reads the CueFile and parses it into the passed CueSheet Structure
 	//Returns 0 on success, or negative values on error //TODO default to internal CueSheet?
 	int Read(CueSheet &);
@@ -117,23 +131,14 @@ class CueFile {
 	std::fstream cue_file;
 	std::string filename;
 	
-	//Low level file management. Return 0on success or error codes on failure
 	int Open();
 	int Close();
 	
-	/*** Cue Handling *********************************************************/
-	//Take std::string, parse and return the type of line it is
-	CueLineType StrToCueLineType(const std::string &input);
-	//Take CueLineType and return a string representation of it
-	std::string CueLineTypeToStr(const CueLineType type);
 	
-	//Take a std::string of a string line and return the TrackType it is
-	CueTrackType StrToCueTrackType(const std::string &input);
-	
+	//TODO Make this a helper anon funct in cpp
 	//Strip Filename string from a FILE .cue Line TODO Change this to be generic
 	std::string StripFilename(const std::string &line);
 };
-
 
 
 
