@@ -3,8 +3,9 @@
 * See the GitHub for more information: https://github.com/ADBeta/cuehandler
 *
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
+* cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    13 Dec 2023    V0.7.2
+* ADBeta    13 Dec 2023    V0.7.4
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -18,7 +19,10 @@
 //Hierarchical structure of all the infomation contained in a .cue file and 
 //Functions to handle the data structures
 struct CueSheet {
-	/*** Cue Sheet Data Types *********************************************/
+	/*** Cue Sheet Data Structures ********************************************/
+	//Error values
+	uint32_t timestamp_error = 0xFFFFFFFF;
+	
 	//TRACK Type Enumeration
 	enum class CueTrackType {
 		Invalid,                   //Catch-all if error occurs
@@ -32,7 +36,6 @@ struct CueSheet {
 		CDI_2352                   //CDI Mode 2 Data   
 	};
 	
-	/*** Cue Sheet Data Structures ********************************************/
 	//Line Type Enumeration
 	enum class CueLineType {
 		Invalid,
@@ -42,18 +45,29 @@ struct CueSheet {
 		Remark
 	};
 	
-	/*** Structure Functions **********************************************/
+	/*** Structure Functions **************************************************/
 	//Take std::string, parse and return the type of line it is
+	//Returns ::Invalid on failure
 	static CueLineType StrToCueLineType(const std::string &input);
 	//Take CueLineType and return a string representation of it
+	//Returns Empty string on failure
 	static std::string CueLineTypeToStr(const CueLineType type);
 	
 	//Take a std::string of a string line and return the TrackType it is
+	//Returns ::Invalid on failure
 	static CueTrackType StrToCueTrackType(const std::string &input);
 	//Take a CueTrackType return the string Representation of it
+	//Returns Empty string on failure
 	static std::string CueTrackTypeToStr(const CueTrackType type);
 	
-	/*** API / Helper Functions *******************************************/
+	//Converts bytes value to a timestamp string
+	//Returns Empty string on failure
+	std::string BytesToTimestamp(uint32_t bytes);	
+	//Convers a timestamp string to a bytes offset value
+	
+	uint32_t TimestampToBytes(std::string timestamp);
+	
+	/*** API / Helper Functions ***********************************************/
 
 
 
@@ -133,11 +147,6 @@ class CueFile {
 	
 	int Open();
 	int Close();
-	
-	
-	//TODO Make this a helper anon funct in cpp
-	//Strip Filename string from a FILE .cue Line TODO Change this to be generic
-	std::string StripFilename(const std::string &line);
 };
 
 
