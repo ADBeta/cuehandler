@@ -1,7 +1,9 @@
 # cuehandler
 
-This is a Small & Efficient library to Create, Modify and Impliment .CUE Files
-in C++11 and Newer.
+This is a small and efficient library to create, modify, and impliment .CUE 
+files in C++11 and newer.
+
+Good replacement for libcue
 
 ## TODO
 

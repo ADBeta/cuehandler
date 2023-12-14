@@ -5,7 +5,7 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    13 Dec 2023    V0.7.4
+* ADBeta    14 Dec 2023    V0.8.1
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -14,15 +14,33 @@
 #include <list>
 #include <fstream>
 #include <cstdint>
+#include <limits>
+
+/*** Cue File/Sheet Exceptions ************************************************/
+class CueException : public std::exception {
+	public:
+	CueException(const char *msg) : errMsg(msg) {}
+	const char *what () const noexcept override { 
+		return errMsg;
+	}
+
+	private:
+	const char *errMsg;
+};
+
+//Cue Sheet Exceptions
+extern CueException time_bad_string;
+extern CueException time_sector_mismatch;
+
+
+//Cue File Exceptions
+
 
 /*** Cue Sheet Data Handling & Structure **************************************/
 //Hierarchical structure of all the infomation contained in a .cue file and 
 //Functions to handle the data structures
 struct CueSheet {
 	/*** Cue Sheet Data Structures ********************************************/
-	//Error values
-	uint32_t timestamp_error = 0xFFFFFFFF;
-	
 	//TRACK Type Enumeration
 	enum class CueTrackType {
 		Invalid,                   //Catch-all if error occurs
@@ -60,20 +78,24 @@ struct CueSheet {
 	//Returns Empty string on failure
 	static std::string CueTrackTypeToStr(const CueTrackType type);
 	
+	//Returns how many bytes are in a sector depending on CueTrackType.
+	//Returns 0 on error
+	static uint16_t GetSectorBytesInTrackType(const CueTrackType type); 
+	
 	//Converts bytes value to a timestamp string
 	//Returns Empty string on failure
-	std::string BytesToTimestamp(uint32_t bytes);	
+	std::string BytesToTimestamp(const uint32_t bytes, const CueTrackType);	
 	//Convers a timestamp string to a bytes offset value
-	
-	uint32_t TimestampToBytes(std::string timestamp);
+	//Returns 0 and throws on error (time_bad_string or time_sector_mismatch)
+	uint32_t TimestampToBytes(const std::string &timestamp, const CueTrackType);
 	
 	/*** API / Helper Functions ***********************************************/
-
-
-
 	//Prints all the information stored in the CueSheet to std out
 	int Print() const;
 
+
+
+	/*** Cue Structure ********************************************************/
 	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
 	struct FileObj {
 		//Initializer list
