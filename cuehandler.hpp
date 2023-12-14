@@ -29,6 +29,8 @@ class CueException : public std::exception {
 };
 
 //Cue Sheet Exceptions
+extern CueException track_type_invalid;
+
 extern CueException time_bad_string;
 extern CueException time_sector_mismatch;
 
@@ -39,6 +41,7 @@ extern CueException time_sector_mismatch;
 /*** Cue Sheet Data Handling & Structure **************************************/
 //Hierarchical structure of all the infomation contained in a .cue file and 
 //Functions to handle the data structures
+//All IDs and the Timestamp is limited to 99 to conform to the CUE/CD Standards
 struct CueSheet {
 	/*** Cue Sheet Data Structures ********************************************/
 	//TRACK Type Enumeration
@@ -84,10 +87,12 @@ struct CueSheet {
 	
 	//Converts bytes value to a timestamp string
 	//Returns Empty string on failure
-	std::string BytesToTimestamp(const uint32_t bytes, const CueTrackType);	
+	static std::string BytesToTimestamp(const uint32_t bytes, 
+	                                    const CueTrackType);	
 	//Convers a timestamp string to a bytes offset value
 	//Returns 0 and throws on error (time_bad_string or time_sector_mismatch)
-	uint32_t TimestampToBytes(const std::string &timestamp, const CueTrackType);
+	static uint32_t TimestampToBytes(const std::string &timestamp, 
+	                                 const CueTrackType);
 	
 	/*** API / Helper Functions ***********************************************/
 	//Prints all the information stored in the CueSheet to std out
