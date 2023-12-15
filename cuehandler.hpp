@@ -5,8 +5,12 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    14 Dec 2023    V0.8.1
+* ADBeta    15 Dec 2023    V0.9.5
 *******************************************************************************/
+//TODO Cue file size handling for combine. ??
+//Maybe binary handling????
+//TODO Allow disable of safeties
+
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
 
@@ -27,14 +31,8 @@ class CueException : public std::exception {
 	private:
 	const char *errMsg;
 };
-
+//TODO
 //Cue Sheet Exceptions
-extern CueException track_type_invalid;
-
-extern CueException time_bad_string;
-extern CueException time_sector_mismatch;
-
-
 //Cue File Exceptions
 
 
@@ -43,9 +41,11 @@ extern CueException time_sector_mismatch;
 //Functions to handle the data structures
 //All IDs and the Timestamp is limited to 99 to conform to the CUE/CD Standards
 struct CueSheet {
+	static const uint32_t timestamp_nval = std::numeric_limits<uint32_t>::max();
+
 	/*** Cue Sheet Data Structures ********************************************/
 	//TRACK Type Enumeration
-	enum class CueTrackType {
+	enum class TrackType {
 		Invalid,                   //Catch-all if error occurs
 		AUDIO,                     //Audio/Music (2352 — 588 samples)
 		CDG,                       //Karaoke CD+G (2448)
@@ -58,7 +58,7 @@ struct CueSheet {
 	};
 	
 	//Line Type Enumeration
-	enum class CueLineType {
+	enum class LineType {
 		Invalid,
 		File,
 		Track,
@@ -66,40 +66,6 @@ struct CueSheet {
 		Remark
 	};
 	
-	/*** Structure Functions **************************************************/
-	//Take std::string, parse and return the type of line it is
-	//Returns ::Invalid on failure
-	static CueLineType StrToCueLineType(const std::string &input);
-	//Take CueLineType and return a string representation of it
-	//Returns Empty string on failure
-	static std::string CueLineTypeToStr(const CueLineType type);
-	
-	//Take a std::string of a string line and return the TrackType it is
-	//Returns ::Invalid on failure
-	static CueTrackType StrToCueTrackType(const std::string &input);
-	//Take a CueTrackType return the string Representation of it
-	//Returns Empty string on failure
-	static std::string CueTrackTypeToStr(const CueTrackType type);
-	
-	//Returns how many bytes are in a sector depending on CueTrackType.
-	//Returns 0 on error
-	static uint16_t GetSectorBytesInTrackType(const CueTrackType type); 
-	
-	//Converts bytes value to a timestamp string
-	//Returns Empty string on failure
-	static std::string BytesToTimestamp(const uint32_t bytes, 
-	                                    const CueTrackType);	
-	//Convers a timestamp string to a bytes offset value
-	//Returns 0 and throws on error (time_bad_string or time_sector_mismatch)
-	static uint32_t TimestampToBytes(const std::string &timestamp, 
-	                                 const CueTrackType);
-	
-	/*** API / Helper Functions ***********************************************/
-	//Prints all the information stored in the CueSheet to std out
-	int Print() const;
-
-
-
 	/*** Cue Structure ********************************************************/
 	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
 	struct FileObj {
@@ -112,11 +78,11 @@ struct CueSheet {
 					
 		//Cue "TRACK" Object, has "INDEX"s and some Track info
 		struct TrackObj {
-			TrackObj(uint16_t t_id, CueTrackType t_type)
+			TrackObj(uint16_t t_id, TrackType t_type)
 				: id(t_id), type(t_type) {}
 			
 			uint16_t id;
-			CueTrackType type;
+			TrackType type;
 			
 			//Cue "INDEX" Object. Has Index data
 			struct IndexObj {
@@ -134,6 +100,42 @@ struct CueSheet {
 	};
 	//List of FILEs inside each Cue Sheet
 	std::list<FileObj> FileList;
+	
+	/*** Structure Functions **************************************************/
+	//Take std::string, parse and return the type of line it is
+	//Returns ::Invalid on failure
+	static LineType StrToLineType(const std::string &input);
+	//Take LineType and return a string representation of it
+	//Returns Empty string on failure
+	static std::string LineTypeToStr(const LineType type);
+	
+	//Take a std::string of a string line and return the TrackType it is
+	//Returns ::Invalid on failure
+	static TrackType StrToTrackType(const std::string &input);
+	//Take a TrackType return the string Representation of it
+	//Returns Empty string on failure
+	static std::string TrackTypeToStr(const TrackType type);
+	
+	//Returns how many bytes are in a sector depending on TrackType.
+	//Returns 0 on error
+	static uint16_t GetSectorBytesInTrackType(const TrackType type); 
+	
+	//Converts bytes value to a timestamp string
+	//Returns Empty string on error
+	static std::string BytesToTimestamp(const uint32_t bytes, const TrackType);	
+	//Convers a timestamp string to a bytes offset value
+	//Returns timestamp_nval on error.
+	static uint32_t TimestampToBytes(const std::string &timestamp, const TrackType);
+	
+	/*** API / Helper Functions ***********************************************/
+	//Takes CueSheet Obj and returns parent in structure of type requested
+	//Returns NULL if there is an error
+	FileObj                     *GetParentFile();
+	FileObj::TrackObj           *GetParentTrack();
+	FileObj::TrackObj::IndexObj *GetParentIndex();
+	
+	//Prints all the information stored in the CueSheet to std out
+	int Print() const;
 };
 
 /*** Cue File Management ******************************************************/

@@ -16,8 +16,8 @@ int main(/*const int argc, const char *argv[]*/) {
 	
 	CueSheet test;
 	
-	uint32_t tsb = CueSheet::TimestampToBytes("00:02:00", CueSheet::CueTrackType::AUDIO);	
-	std::string tss = CueSheet::BytesToTimestamp(tsb, CueSheet::CueTrackType::AUDIO);
+	uint32_t tsb = CueSheet::TimestampToBytes("00:02:00", CueSheet::TrackType::AUDIO);	
+	std::string tss = CueSheet::BytesToTimestamp(tsb, CueSheet::TrackType::AUDIO);
 	
 	std::cout << "Tsb: " << tsb << "   Tss: " << tss << std::endl;
 	
