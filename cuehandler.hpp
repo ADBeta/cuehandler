@@ -5,7 +5,7 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    15 Dec 2023    V0.9.5
+* ADBeta    16 Dec 2023    V0.10.1
 *******************************************************************************/
 //TODO Cue file size handling for combine. ??
 //Maybe binary handling????
@@ -33,6 +33,16 @@ class CueException : public std::exception {
 };
 //TODO
 //Cue Sheet Exceptions
+extern CueException file_push_null_input;
+extern CueException track_push_null_input;
+extern CueException index_push_null_input;
+
+extern CueException track_push_overspec;
+extern CueException index_push_overspec;
+
+extern CueException track_push_null_file;
+extern CueException index_push_null_track;
+
 //Cue File Exceptions
 
 
@@ -128,11 +138,18 @@ struct CueSheet {
 	static uint32_t TimestampToBytes(const std::string &timestamp, const TrackType);
 	
 	/*** API / Helper Functions ***********************************************/
+	//Push a FILE, TRACK, or INDEX to the CueSheet. Always pushed to end.
+	//Returns -1 and throws error on failure. Returns 0 on success
+	//TODO Add safety 99 disable
+	int PushFile(FileObj                      *file_ptr);
+	int PushTrack(FileObj::TrackObj           *track_ptr);
+	int PushIndex(FileObj::TrackObj::IndexObj *index_ptr);
+		
 	//Takes CueSheet Obj and returns parent in structure of type requested
 	//Returns NULL if there is an error
-	FileObj                     *GetParentFile();
-	FileObj::TrackObj           *GetParentTrack();
-	FileObj::TrackObj::IndexObj *GetParentIndex();
+	FileObj                     *GetLastFile();
+	FileObj::TrackObj           *GetLastTrack();
+	FileObj::TrackObj::IndexObj *GetLastIndex();
 	
 	//Prints all the information stored in the CueSheet to std out
 	int Print() const;
