@@ -5,7 +5,7 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    16 Dec 2023    V0.10.1
+* ADBeta    17 Dec 2023    V0.12.0
 *******************************************************************************/
 //TODO Cue file size handling for combine. ??
 //Maybe binary handling????
@@ -81,26 +81,27 @@ struct CueSheet {
 	struct FileObj {
 		//Initializer list
 		FileObj(std::string fn, std::string ft) 
-			: filename(fn), filetype(ft) {}
+			                                     : filename(fn), filetype(ft) {}
 	
 		std::string filename;
 		std::string filetype;
+		size_t bytes;
 					
 		//Cue "TRACK" Object, has "INDEX"s and some Track info
 		struct TrackObj {
 			TrackObj(uint16_t t_id, TrackType t_type)
-				: id(t_id), type(t_type) {}
+			                                         : id(t_id), type(t_type) {}
 			
 			uint16_t id;
 			TrackType type;
 			
 			//Cue "INDEX" Object. Has Index data
 			struct IndexObj {
-				IndexObj(uint16_t i_id, uint32_t i_bytes)
-					: id(i_id), bytes(i_bytes) {}
+				IndexObj(uint16_t i_id, uint32_t i_offset)
+				                                 : id(i_id), offset(i_offset) {}
 			
 				uint16_t id;
-				uint32_t bytes;
+				uint32_t offset;
 			};
 			//List of INDEXs inside each TRACK
 			std::list<IndexObj> IndexList;
@@ -150,6 +151,9 @@ struct CueSheet {
 	FileObj                     *GetLastFile();
 	FileObj::TrackObj           *GetLastTrack();
 	FileObj::TrackObj::IndexObj *GetLastIndex();
+	
+	//Deletes all data from the CueSheet and frees up memory
+	void Clear();
 	
 	//Prints all the information stored in the CueSheet to std out
 	int Print() const;
