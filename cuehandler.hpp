@@ -5,10 +5,8 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    17 Dec 2023    V0.12.0
+* ADBeta    19 Dec 2023    V0.14.3
 *******************************************************************************/
-//TODO Cue file size handling for combine. ??
-//Maybe binary handling????
 //TODO Allow disable of safeties
 
 #ifndef CUEHANDLER_H
@@ -31,8 +29,10 @@ class CueException : public std::exception {
 	private:
 	const char *errMsg;
 };
-//TODO
-//Cue Sheet Exceptions
+
+//Exceptions
+extern CueException file_invalid;
+
 extern CueException file_push_null_input;
 extern CueException track_push_null_input;
 extern CueException index_push_null_input;
@@ -43,14 +43,13 @@ extern CueException index_push_overspec;
 extern CueException track_push_null_file;
 extern CueException index_push_null_track;
 
-//Cue File Exceptions
-
 
 /*** Cue Sheet Data Handling & Structure **************************************/
 //Hierarchical structure of all the infomation contained in a .cue file and 
 //Functions to handle the data structures
 //All IDs and the Timestamp is limited to 99 to conform to the CUE/CD Standards
 struct CueSheet {
+//TODO Remove this?
 	static const uint32_t timestamp_nval = std::numeric_limits<uint32_t>::max();
 
 	/*** Cue Sheet Data Structures ********************************************/
@@ -80,13 +79,12 @@ struct CueSheet {
 	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
 	struct FileObj {
 		//Initializer list
-		FileObj(std::string fn, std::string ft) 
-			                                     : filename(fn), filetype(ft) {}
-	
+		FileObj(std::string fn, std::string ft, size_t fb) 
+			                          : filename(fn), filetype(ft), bytes(fb) {}
 		std::string filename;
 		std::string filetype;
 		size_t bytes;
-					
+		
 		//Cue "TRACK" Object, has "INDEX"s and some Track info
 		struct TrackObj {
 			TrackObj(uint16_t t_id, TrackType t_type)
@@ -172,12 +170,15 @@ class CueFile {
 
 
 	//Reads the CueFile and parses it into the passed CueSheet Structure
-	//Returns 0 on success, or negative values on error //TODO default to internal CueSheet?
+	//Returns 0 on success. Throws Exception and returns negative value on error
 	int Read(CueSheet &);
 	
 	//TODO write
 	
-	//TODO Modifiers
+	//File Attribute & Data functions
+	size_t GetFileBytes(const std::string &fname);
+	
+	
 	
 	//TODO windows to linux line end
 	//
@@ -192,6 +193,7 @@ class CueFile {
 	//private:
 
 	/*** File Management ******************************************************/
+	
 	std::fstream cue_file;
 	std::string filename;
 	
