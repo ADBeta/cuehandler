@@ -5,7 +5,7 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    19 Dec 2023    V0.14.3
+* ADBeta    20 Dec 2023    V1.0.0
 *******************************************************************************/
 //TODO Allow disable of safeties
 
@@ -75,21 +75,21 @@ struct CueSheet {
 		Remark
 	};
 	
+	//TODO add destructor
 	/*** Cue Structure ********************************************************/
 	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
 	struct FileObj {
 		//Initializer list
-		FileObj(std::string fn, std::string ft, size_t fb) 
+		FileObj(std::string fn, std::string ft, uint32_t fb) 
 			                          : filename(fn), filetype(ft), bytes(fb) {}
 		std::string filename;
 		std::string filetype;
-		size_t bytes;
+		uint32_t bytes;
 		
 		//Cue "TRACK" Object, has "INDEX"s and some Track info
 		struct TrackObj {
 			TrackObj(uint16_t t_id, TrackType t_type)
 			                                         : id(t_id), type(t_type) {}
-			
 			uint16_t id;
 			TrackType type;
 			
@@ -97,7 +97,6 @@ struct CueSheet {
 			struct IndexObj {
 				IndexObj(uint16_t i_id, uint32_t i_offset)
 				                                 : id(i_id), offset(i_offset) {}
-			
 				uint16_t id;
 				uint32_t offset;
 			};
@@ -136,6 +135,12 @@ struct CueSheet {
 	//Returns timestamp_nval on error.
 	static uint32_t TimestampToBytes(const std::string &timestamp, const TrackType);
 	
+	//Convert CueSheet Objects into standard file strings
+	static std::string FileToStr(const FileObj                      *file_ptr);
+	static std::string TrackToStr(const FileObj::TrackObj           *track_ptr);
+	static std::string IndexToStr(const FileObj::TrackObj::IndexObj *index_ptr,
+	                                                      const TrackType type);
+	
 	/*** API / Helper Functions ***********************************************/
 	//Push a FILE, TRACK, or INDEX to the CueSheet. Always pushed to end.
 	//Returns -1 and throws error on failure. Returns 0 on success
@@ -153,6 +158,20 @@ struct CueSheet {
 	//Deletes all data from the CueSheet and frees up memory
 	void Clear();
 	
+	//Copies the data from [this] to the passed CueSheet
+	//Returns negative values on error. Target Object may get malformed on error
+	int CopyTo(CueSheet &target);
+	
+	//Combines multiple FILE Objects into one, with offset and indexing.
+	//Optional output filename. If left blank will inherit file[0]'s name
+	//Returns negative value on error - leaves object unmodified if failed.
+	int Combine(std::string op_filename = "");
+	
+	//Creates a cue file spec string output based on CueSheet
+	//Returns an empty string on error TODO maybe throw
+	std::string ToString() const;
+	
+	//TODO
 	//Prints all the information stored in the CueSheet to std out
 	int Print() const;
 };
@@ -164,24 +183,17 @@ class CueFile {
 	//Constructor with Member Initilizer List
 	CueFile(const char *fn) : filename(fn) {}	
 	
-	//Destructor to clear RAM overhead
-
-
-
-
 	//Reads the CueFile and parses it into the passed CueSheet Structure
 	//Returns 0 on success. Throws Exception and returns negative value on error
-	int Read(CueSheet &);
+	int Read(CueSheet &cs);
 	
-	//TODO write
+	//Write the passed CueSheet out to the CueFile file.
+	//Returns negative values and throws exceptions on failures
+	int Write(const CueSheet &cs);
 	
 	//File Attribute & Data functions
-	size_t GetFileBytes(const std::string &fname);
-	
-	
-	
-	//TODO windows to linux line end
-	//
+	//Gets and returns bytes in a file. Throws exceptions and returns 0 on error
+	uint32_t GetFileBytes(const std::string &fname);
 	
 	
 	
@@ -193,11 +205,11 @@ class CueFile {
 	//private:
 
 	/*** File Management ******************************************************/
-	
 	std::fstream cue_file;
 	std::string filename;
 	
-	int Open();
+	int OpenRead();
+	int OpenWrite();
 	int Close();
 };
 
@@ -221,142 +233,3 @@ class CueFile {
 
 
 #endif
-
-/*
-
-//Valid FILE formats. (only binary is supported for now)
-enum t_FILE {ftBINARY};
-//String of LINE types mapped to enum
-extern const std::string t_FILE_str[];
-
-
-
-
-** CueHandler Class ********************************************************
-class CueHandler {
-	public:
-	//Constructor takes a filename (char *) and passes it to the TeFiEd cueFile
-	//Also creates the metadata handler structures
-	CueHandler(const std::string filename);
-	
-	//Destructor, deletes metadata array and cleans up TeFiEd object
-	~CueHandler();
-	
-	TeFiEd *cueFile; //TeFiEd text file object
-	
-	** Cue file data structs ***********************************************
-	//INDEXs. Grandchild (3rd level) value. Max 99
-	struct IndexData {
-		unsigned int ID = 0;		
-		//Number of bytes the current index holds
-		unsigned long BYTES = 0;
-	};
-	
-	//Child TRACK (2nd level) object. Max 99
-	struct TrackData {
-		unsigned int ID = 0;
-		t_TRACK TYPE;
-		//Vector of INDEXs
-		std::vector <IndexData> INDEX;
-	};
-	
-	//Parent FILE (Top level) object
-	struct FileData {
-		//FILE data - Default values
-		std::string FILENAME;
-		t_FILE TYPE;
-		//Vector of TRACKs for each FILE
-		std::vector <TrackData> TRACK;
-	};
-	
-	//Vector of FILEs (Cue Data is stored in this nested vector)
-	std::vector <FileData> FILE;
-	
-	//Clears the FILE vector and deallocates its RAM
-	void cleanFILE();
-	
-	** Cue file data functions **********************************************
-	//Returns the t_LINE of the string passed (whole line from cue file)
-	t_LINE LINEStrToType(const std::string lineStr);
-	
-	//Return the t_FILE of the string passed
-	t_FILE FILEStrToType(const std::string fileStr);	
-	
-	//Returns the t_TRACK of the string passed
-	t_TRACK TRACKStrToType(const std::string trackStr);
-	
-	//Returns the FILE type string from t_FILE_str via enum
-	std::string FILETypeToStr(const t_FILE);
-	
-	//Returns the TRACK type string from t_TRACK_str via enum
-	std::string TRACKTypeToStr(const t_TRACK);
-	
-	////////////////////////////////////////////////////////////////////////////
-	//Validation functions. Returns specific error codes
-	//Validate an input .cue file string (argv[1])
-	int validateCueFilename(std::string);
-	
-	//Validate TRACK
-	int validateTRACK(const TrackData &);
-	
-	//Validate INDEX
-	int validateINDEX(const IndexData &);
-	
-	////////////////////////////////////////////////////////////////////////////
-	//Push a new FILE to FILE[]
-	void pushFILE(const std::string FN, const t_FILE TYPE);
-	
-	//Push a new TRACK to the last entry in FILE[]
-	void pushTRACK(const unsigned int ID, const t_TRACK TYPE);
-	
-	//Push a new INDEX to the last entry in FILE[].TRACK[]
-	void pushINDEX(const unsigned int ID, const unsigned long BYTES);
-
-	////////////////////////////////////////////////////////////////////////////
-	//Converts FileData Object into a string for the CUE file
-	std::string generateFILELine(const FileData &);
-	
-	//Converts TrackData Object into a string for the CUE file
-	std::string generateTRACKLine(const TrackData &);
-	
-	//Converts IndexData Object into a string for the CUE file
-	std::string generateINDEXLine(const IndexData &);
-	
-	** Input / Output CUE Handling ******************************************
-	//Gets all the data from a .cue file and populates the FILE vector.
-	void getCueData();
-		
-	//Outputs the CueData to the cueFile
-	int outputCueData();
-	
-	//Prints a passed FileData Object to the cli
-	void printFILE(FileData &);
-	
-	//Read in an existing cue file
-	void read();
-	
-	//Create a new cue file
-	void create();
-
-	** Writing Functions ***************************************************
-	//Output (overwrite) the TeFiEd object RAM into the file.
-	void write();
-
-	* AUX Functions *********************************************************
-	//Converts a number of bytes into an Audio CD timestamp.
-	std::string bytesToTimestamp(const unsigned long bytes);
-	
-	//Converts an Audio CD timestamp into number of bytes
-	unsigned long timestampToBytes(const std::string timestamp);
-	
-	//Modified from TeFiEd. Returns -index- word in a string
-	std::string getWord(const std::string input, unsigned int index);
-	
-	//Takes an input uint32_t, zero-pads to -pad- then return a string
-	std::string padIntStr(const unsigned long val, const unsigned int len = 0,
-	                      const char pad = '0');
-
-}; //class CueHandler
-#endif
-
-*/

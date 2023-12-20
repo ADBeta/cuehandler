@@ -11,7 +11,8 @@
 #include "cuehandler.hpp"
 
 int main(/*const int argc, const char *argv[]*/) {
-	CueFile File("/home/ash/Downloads/test.txt");
+	CueFile File("/home/ash/Downloads/Pepsiman (Japan)/Pepsiman (Japan).cue");
+	CueFile File2("./test.cue");
 	
 	CueSheet test;
 	
@@ -21,6 +22,16 @@ int main(/*const int argc, const char *argv[]*/) {
 	File.Read(test);
 	
 	test.Print();
+	
+	
+	std::cout << "\n\n\n";
+	
+	test.Combine("test.out");
+	
+	
+	test.Print();
+	File2.Write(test);
+	
 	
 	return 0;
 }
