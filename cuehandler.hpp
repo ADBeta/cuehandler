@@ -1,11 +1,15 @@
 /*******************************************************************************
 * This file is part of cuehandler. 
 * See the GitHub for more information: https://github.com/ADBeta/cuehandler
-*
-* A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    22 Dec 2023    V1.2.0
+* A simple & efficient Library to create, modify and impliment .CUE files in C++
+* with detailed support of the GNU Specification, with ability to combine .cue
+* file FILE's into one. 
+*
+* See example.cpp for an example how to use the library
+*
+* ADBeta    22 Dec 2023    V1.4.2
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -45,16 +49,18 @@ extern CueException timestamp_bytes_mismatch;
 extern CueException track_push_null_file;
 extern CueException index_push_null_track;
 
-
 /*** Cue Sheet Data Handling & Structure **************************************/
 //Hierarchical structure of all the infomation contained in a .cue file and 
 //Functions to handle the data structures
 //All IDs and the Timestamp is limited to 99 to conform to the CUE/CD Standards
 struct CueSheet {
-//TODO Remove this?
-	static const uint32_t timestamp_nval = std::numeric_limits<uint32_t>::max();
+	//Destructor carefully clears the nested data structures
+	~CueSheet();
 
 	/*** Cue Sheet Data Structures ********************************************/
+	//Type similar to string::npos, to show timestamp bytes returned in invalid
+	static const uint32_t timestamp_nval = std::numeric_limits<uint32_t>::max();
+	
 	//TRACK Type Enumeration
 	enum class TrackType {
 		Invalid,                   //Catch-all if error occurs
@@ -77,7 +83,6 @@ struct CueSheet {
 		Remark
 	};
 	
-	//TODO add destructor
 	/*** Cue Structure ********************************************************/
 	//Cue "FILE" Object, Top level. Contains TRACKs and INDEXs
 	struct FileObj {
@@ -146,7 +151,6 @@ struct CueSheet {
 	/*** API / Helper Functions ***********************************************/
 	//Push a FILE, TRACK, or INDEX to the CueSheet. Always pushed to end.
 	//Returns -1 and throws error on failure. Returns 0 on success
-	//TODO Add safety 99 disable
 	int PushFile(FileObj                      *file_ptr);
 	int PushTrack(FileObj::TrackObj           *track_ptr);
 	int PushIndex(FileObj::TrackObj::IndexObj *index_ptr);
@@ -170,7 +174,6 @@ struct CueSheet {
 	int Combine(std::string op_filename = "");
 	
 	//Creates a cue file spec string output based on CueSheet
-	//Returns an empty string on error TODO maybe throw
 	std::string ToString() const;
 
 	//Prints all the information stored in the CueSheet to std out
@@ -205,24 +208,5 @@ class CueFile {
 	int OpenWrite();
 	int Close();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

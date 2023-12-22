@@ -2,7 +2,7 @@
 * Example of how to use cuehandler
 *
 *
-*
+* TODO
 *
 *******************************************************************************/
 #include <iostream>
@@ -13,6 +13,9 @@
 int main(/*const int argc, const char *argv[]*/) {
 	CueFile File("/home/ash/Downloads/test.txt");
 	CueFile File2("./test.cue");
+	
+	//TODO Internal example folder and files
+	//TODO try catch blocks and more examples here
 	
 	CueSheet test;
 	
