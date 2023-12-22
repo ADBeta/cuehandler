@@ -5,10 +5,8 @@
 * A Simple & Efficient Library to Create, Modify and Impliment .CUE files in C++
 * cuehandler is under GPL 2.0. See LICENSE for more information
 *
-* ADBeta    20 Dec 2023    V1.0.0
+* ADBeta    22 Dec 2023    V1.2.0
 *******************************************************************************/
-//TODO Allow disable of safeties
-
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
 
@@ -37,8 +35,12 @@ extern CueException file_push_null_input;
 extern CueException track_push_null_input;
 extern CueException index_push_null_input;
 
-extern CueException track_push_overspec;
-extern CueException index_push_overspec;
+extern CueException track_id_too_high;
+extern CueException index_id_too_high;
+extern CueException timestamp_invalid_minutes;
+extern CueException timestamp_invalid_track;
+extern CueException timestamp_invalid_bytes;
+extern CueException timestamp_bytes_mismatch;
 
 extern CueException track_push_null_file;
 extern CueException index_push_null_track;
@@ -170,8 +172,7 @@ struct CueSheet {
 	//Creates a cue file spec string output based on CueSheet
 	//Returns an empty string on error TODO maybe throw
 	std::string ToString() const;
-	
-	//TODO
+
 	//Prints all the information stored in the CueSheet to std out
 	int Print() const;
 };
@@ -195,16 +196,8 @@ class CueFile {
 	//Gets and returns bytes in a file. Throws exceptions and returns 0 on error
 	uint32_t GetFileBytes(const std::string &fname);
 	
-	
-	
-	
-	
-	
-
 	/*** Private Members ******************************************************/
-	//private:
-
-	/*** File Management ******************************************************/
+	private:
 	std::fstream cue_file;
 	std::string filename;
 	
