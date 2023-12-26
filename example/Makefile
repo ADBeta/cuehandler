@@ -1,7 +1,7 @@
 #TARGET
 TARGET := ./example
 
-SRCS := $(wildcard ./*.cpp)
+SRCS := $(wildcard ./*.cpp) $(wildcard ../*.cpp)
 
 #Compiler
 CC := g++
@@ -15,7 +15,7 @@ CFLAGS   := -std=c++11 -Wall -Wsign-conversion -Wmissing-declarations -Wconversi
 
 #Make binary
 all:
-	$(CC) $(SRCS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
+	$(CC) $(SRCS) -I../ $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $(TARGET)
 
 #Remove objects and binary
 clean:

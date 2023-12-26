@@ -10,30 +10,35 @@
 
 #include "cuehandler.hpp"
 
-int main(/*const int argc, const char *argv[]*/) {
-	CueFile File("/home/ash/Downloads/test.txt");
-	CueFile File2("./test.cue");
+int main(const int argc, const char *argv[]) {
+	CueFile FileI(argv[1]);
+	CueFile FileO("./test-out.cue");
 	
 	//TODO Internal example folder and files
 	//TODO try catch blocks and more examples here
-	
 	CueSheet test;
 	
 	
+	std::cout << FileI.OpenRead() << std::endl;
+	std::cout << FileI.Close() << std::endl;
 	
-	//std::cout << File.Open() << std::endl;
-	File.Read(test);
+	FileI.ReadCueData(test);
+	
+	std::cout << "here" << std::endl;
+	
+	
+	FileI.GetCueFileSizes(test);
 	
 	test.Print();
 	
 	
 	std::cout << "\n\n\n";
 	
-	test.Combine("test.out");
+	test.Combine("test-out.cue");
 	
 	
 	test.Print();
-	File2.Write(test);
+	FileO.WriteCueData(test);
 	
 	
 	return 0;

@@ -9,7 +9,7 @@
 *
 * See example.cpp for an example how to use the library
 *
-* ADBeta    22 Dec 2023    V1.4.2
+* ADBeta    26 Dec 2023    V1.6.1
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -34,6 +34,8 @@ class CueException : public std::exception {
 
 //Exceptions
 extern CueException file_invalid;
+extern CueException internal_file_invalid;
+extern CueException line_invalid;
 
 extern CueException file_push_null_input;
 extern CueException track_push_null_input;
@@ -170,8 +172,8 @@ struct CueSheet {
 	
 	//Combines multiple FILE Objects into one, with offset and indexing.
 	//Optional output filename. If left blank will inherit file[0]'s name
-	//Returns negative value on error - leaves object unmodified if failed.
-	int Combine(std::string op_filename = "");
+	//Leaves object unmodified if failed.
+	void Combine(std::string op_filename = "");
 	
 	//Creates a cue file spec string output based on CueSheet
 	std::string ToString() const;
@@ -189,18 +191,22 @@ class CueFile {
 	
 	//Reads the CueFile and parses it into the passed CueSheet Structure
 	//Returns 0 on success. Throws Exception and returns negative value on error
-	int Read(CueSheet &cs);
+	int ReadCueData(CueSheet &cs);
+	
+	//Reads the files inside the .cue data, and populates the FileObj's bytes
+	//Returns -1 and throws on error
+	int GetCueFileSizes(CueSheet &cs, std::string base_dir = "");
 	
 	//Write the passed CueSheet out to the CueFile file.
 	//Returns negative values and throws exceptions on failures
-	int Write(const CueSheet &cs);
+	int WriteCueData(const CueSheet &cs);
 	
 	//File Attribute & Data functions
 	//Gets and returns bytes in a file. Throws exceptions and returns 0 on error
 	uint32_t GetFileBytes(const std::string &fname);
 	
 	/*** Private Members ******************************************************/
-	private:
+	//private:
 	std::fstream cue_file;
 	std::string filename;
 	
