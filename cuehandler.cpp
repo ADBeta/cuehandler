@@ -376,6 +376,11 @@ int CueSheet::PushIndex(FileObj::TrackObj::IndexObj *index_ptr) {
 
 int CueSheet::PopFile() {
 
+	while(this->PopTrack() == 0);
+	
+	if(!this->FileList.empty()) this->FileList.pop_back();
+	
+	return 0;
 }
 
 int CueSheet::PopTrack() {
@@ -423,33 +428,34 @@ std::string CueSheet::ToString() const {
 }
 
 int CueSheet::Print() const {
-	int ret = 0;
-	if(this->FileList.empty()) ret = -1;
+	if(this->FileList.empty()) return -1;
 
-	if(ret == 0) {
-		for(const auto &f_itr : this->FileList) {
-			std::cout << FileToStr(&f_itr) + "    " << f_itr.bytes << " bytes\n";
-			for(const auto &t_itr : f_itr.TrackList) {
-				std::cout << TrackToStr(&t_itr) << "\n";
-				for(const auto &i_itr : t_itr.IndexList) {
-					std::cout << IndexToStr(&i_itr, t_itr.type) << "    " 
-						      << i_itr.offset << " bytes offset\n";
-				}
+	for(const auto &f_itr : this->FileList) {
+		std::cout << FileToStr(&f_itr) + "    " << f_itr.bytes << " bytes\n";
+		for(const auto &t_itr : f_itr.TrackList) {
+			std::cout << TrackToStr(&t_itr) << "\n";
+			for(const auto &i_itr : t_itr.IndexList) {
+				std::cout << IndexToStr(&i_itr, t_itr.type) << "    " 
+					      << i_itr.offset << " bytes offset\n";
 			}
 		}
 	}
 	
-	return ret;
+	return 0;
 }
 
-void CueSheet::Combine(std::string op_filename) {
-	//Push top level file from this to placeholder
+void CueSheet::Combine(std::string op_filename, std::string op_filetype) {
+	//If the file list is empty, exit early
+	if(this->FileList.empty()) return;	
+	
+	//Check input strings and set them to the parent FileObjs strings if they
+	//were not specified
 	if(op_filename.empty()) op_filename = this->FileList.begin()->filename;
-	std::string type = this->FileList.begin()->filetype;
+	if(op_filetype.empty()) op_filetype = this->FileList.begin()->filetype;
 	
 	//Create a temp cue sheet to copy to, this will be the new Combined File
 	CueSheet temp_cue;
-	FileObj temp_file(op_filename, type, 0);
+	FileObj temp_file(op_filename, op_filetype, 0);
 	if(temp_cue.PushFile(&temp_file) != 0) return;
 	
 	//Keep track of the total bytes in all files so far, for index offsets

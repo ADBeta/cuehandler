@@ -1,12 +1,12 @@
-FILE "beep.mp3" MP3
+FILE "click.mp3" MP3
   TRACK 01 AUDIO
     INDEX 01 00:00:00
-FILE "click.mp3" MP3
+FILE "ping.mp3" MP3
   TRACK 02 AUDIO
     INDEX 01 00:00:00
-FILE "ping.mp3" MP3
+FILE "pop.mp3" MP3
   TRACK 03 AUDIO
     INDEX 01 00:00:00
-FILE "pop.mp3" MP3
+FILE "beep.mp3" MP3
   TRACK 04 AUDIO
     INDEX 01 00:00:00

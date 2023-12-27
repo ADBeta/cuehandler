@@ -1,1 +1,9 @@
-FILE "demo-combined.cue" MP3
+FILE "demo-combined.bin" JUKEBOX
+  TRACK 01 AUDIO
+    INDEX 01 00:00:00
+  TRACK 02 AUDIO
+    INDEX 01 00:00:08
+  TRACK 03 AUDIO
+    INDEX 01 00:00:18
+  TRACK 04 AUDIO
+    INDEX 01 00:00:25

@@ -177,9 +177,10 @@ struct CueSheet {
 	int CopyTo(CueSheet &target);
 	
 	//Combines multiple FILE Objects into one, with offset and indexing.
-	//Optional output filename. If left blank will inherit file[0]'s name
+	//Optional output filename and filetype. If left blank will inherit 
+	//file[0]'s name and type
 	//Leaves object unmodified if failed.
-	void Combine(std::string op_filename = "");
+	void Combine(std::string op_filename = "", std::string op_filetype = "");
 	
 	//Creates a cue file spec string output based on CueSheet
 	std::string ToString() const;
@@ -209,7 +210,7 @@ class CueFile {
 	
 	//File Attribute & Data functions
 	//Gets and returns bytes in a file. Throws exceptions and returns 0 on error
-	uint32_t GetFileBytes(const std::string &fname);
+	static uint32_t GetFileBytes(const std::string &fname);
 	
 	/*** Private Members ******************************************************/
 	//private:
