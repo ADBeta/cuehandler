@@ -9,7 +9,7 @@
 *
 * See example.cpp for an example how to use the library
 *
-* ADBeta    26 Dec 2023    V1.6.1
+* ADBeta    27 Dec 2023    V1.7.0
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
@@ -151,17 +151,23 @@ struct CueSheet {
 	                                                      const TrackType type);
 	
 	/*** API / Helper Functions ***********************************************/
+	//Takes CueSheet Obj and returns parent in structure of type requested
+	//Returns NULL if there is an error
+	FileObj                     *GetLastFile();
+	FileObj::TrackObj           *GetLastTrack();
+	FileObj::TrackObj::IndexObj *GetLastIndex();	
+	
 	//Push a FILE, TRACK, or INDEX to the CueSheet. Always pushed to end.
 	//Returns -1 and throws error on failure. Returns 0 on success
 	int PushFile(FileObj                      *file_ptr);
 	int PushTrack(FileObj::TrackObj           *track_ptr);
 	int PushIndex(FileObj::TrackObj::IndexObj *index_ptr);
-		
-	//Takes CueSheet Obj and returns parent in structure of type requested
-	//Returns NULL if there is an error
-	FileObj                     *GetLastFile();
-	FileObj::TrackObj           *GetLastTrack();
-	FileObj::TrackObj::IndexObj *GetLastIndex();
+	
+	//Pop a FILE, TRACK or INDEX from the CueSheet. Ensures there is no leaked
+	//memory. Returns -1 for nullptr errors and -2 for empty errors
+	int PopFile();
+	int PopTrack();
+	int PopIndex();
 	
 	//Deletes all data from the CueSheet and frees up memory
 	void Clear();

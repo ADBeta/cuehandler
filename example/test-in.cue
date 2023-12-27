@@ -1,11 +1,12 @@
-FILE "Rayman (Europe) (En,Fr,De) (Track 01).bin" BINARY
-  TRACK 01 MODE2/2352
+FILE "beep.mp3" MP3
+  TRACK 01 AUDIO
     INDEX 01 00:00:00
-FILE "Rayman (Europe) (En,Fr,De) (Track 02).bin" BINARY
+FILE "click.mp3" MP3
   TRACK 02 AUDIO
-    INDEX 00 00:00:00
-    INDEX 01 00:02:00
-FILE "Rayman (Europe) (En,Fr,De) (Track 03).bin" BINARY
+    INDEX 01 00:00:00
+FILE "ping.mp3" MP3
   TRACK 03 AUDIO
-    INDEX 00 00:00:00
-    INDEX 01 00:02:00
+    INDEX 01 00:00:00
+FILE "pop.mp3" MP3
+  TRACK 04 AUDIO
+    INDEX 01 00:00:00

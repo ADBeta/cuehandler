@@ -11,34 +11,57 @@
 #include "cuehandler.hpp"
 
 int main(const int argc, const char *argv[]) {
-	CueFile FileI(argv[1]);
+
+	//Create an input and output cue file, using the CueFile handler class
+	CueFile FileI("./test-in.cue");
 	CueFile FileO("./test-out.cue");
 	
-	//TODO Internal example folder and files
-	//TODO try catch blocks and more examples here
-	CueSheet test;
+	//Create a Cue Sheet data object using the CueSheet class 
+	CueSheet CueData;
 	
 	
-	std::cout << FileI.OpenRead() << std::endl;
-	std::cout << FileI.Close() << std::endl;
+	try {
+		//Read the Cue Data from the Input File into the CueSheet object CueData
+		FileI.ReadCueData(CueData);
+		//Read the Size of each FILE Entry given in the Input Cue File.
+		//Note that this is only necessary for the .Combine method, and is
+		//optional if your uses of the library do not need the functionality 
+		//to know the size of input files	
+		FileI.GetCueFileSizes(CueData);
 	
-	FileI.ReadCueData(test);
+	} catch(CueException &e) {
+		std::cerr << "Error while reading Cue Data: " << e.what() << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	
-	std::cout << "here" << std::endl;
+	//Print the information held in CueData. This is for debugging and verbosity
+	std::cout << "    Data Before Combining\n"
+	          << "----------------------------------------------------------\n";
+	CueData.Print();
+	
+	//Combine the CueSheet entries into a single file. This was specifically
+	//added for a project called psx-combine, but is useful in other limited
+	//applicaiton.
+	//I define the output FILE test as demo-combined.bin just for example.
+	//If this field is left empty it will inherit the first FILE of the original
+	//input file
+	CueData.Combine("demo-combined.cue");
 	
 	
-	FileI.GetCueFileSizes(test);
+	CueData.PopTrack();
+	CueData.PopTrack();
+	CueData.PopTrack();
+	CueData.PopTrack();
+	CueData.PopTrack();
 	
-	test.Print();
+	//Print the CueSheet information again to show that is has been modified
+	std::cout << "\n\n    Data After Combining\n" 
+	          << "----------------------------------------------------------\n";
+	CueData.Print();
 	
 	
-	std::cout << "\n\n\n";
-	
-	test.Combine("test-out.cue");
-	
-	
-	test.Print();
-	FileO.WriteCueData(test);
+	//Create and write out to the OutputFile in the local directory
+	FileO.WriteCueData(CueData);
 	
 	
 	return 0;
