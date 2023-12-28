@@ -82,7 +82,7 @@ static std::string GetParentDir(const std::string &input) {
 
 //Gets nth word starting from the front of an input string
 static std::string GetWordFromFront(const size_t word_index,
-                                      const std::string &input) {
+                                                     const std::string &input) {
 	const char *delims = " \t\r";
 	std::string word_str;
 	
@@ -108,7 +108,7 @@ static std::string GetWordFromFront(const size_t word_index,
 
 //Gets nth word starting from the back of an input string
 static std::string GetWordFromBack(const size_t word_index,
-                                     const std::string &input) {	
+                                                     const std::string &input) {	
 	const char *delims = " \t\r";
 	std::string word_str;
 	
@@ -135,7 +135,7 @@ static std::string GetWordFromBack(const size_t word_index,
 //Takes a value and divisor, (uint32_t) and sets passed quotient & remainder 
 //variables (uint32_t)
 static void DivideWithRemainder32(const uint32_t value, const uint32_t divisor,
-                                 uint32_t &quotient, uint32_t &remainder) {
+                                      uint32_t &quotient, uint32_t &remainder) {
 	quotient = value / divisor;
 	remainder = value % divisor;
 }

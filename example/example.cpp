@@ -1,9 +1,10 @@
 /*******************************************************************************
-* Example of how to use cuehandler
+* This is an example file of how to use the cuehandler library in projects.
+* See cuehandler.hpp for more details on each function, notes about their
+* return values, and how they function.
 *
-*
-* TODO
-*
+* ADBeta 28 Dec 2023
+* Version 1.0.0
 *******************************************************************************/
 #include <iostream>
 #include <string>

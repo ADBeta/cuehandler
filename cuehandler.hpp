@@ -9,7 +9,7 @@
 *
 * See example.cpp for an example how to use the library
 *
-* ADBeta    27 Dec 2023    V1.7.2
+* ADBeta    28 Dec 2023    V2.0.0
 *******************************************************************************/
 #ifndef CUEHANDLER_H
 #define CUEHANDLER_H
